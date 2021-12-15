@@ -5,6 +5,8 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     // Since React 17 and typescript 4.1 you can safely disable the rule
     'react/react-in-jsx-scope': 'off',
+    'import/no-named-as-default': 'off',
+    'import/newline-after-import': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

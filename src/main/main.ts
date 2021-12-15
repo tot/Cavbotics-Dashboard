@@ -17,6 +17,10 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
+const ntClient = require('wpilib-nt-client');
+
+const client = new ntClient.Client();
+
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -31,6 +35,22 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.on('network', async (event, arg) => {
+  console.log('hello');
+  client.start((isConnected: any, err: any) => {
+    console.log({ isConnected, err });
+  }, 'roborio-8590.local');
+
+  client.addListener((key, val, type, id) => {
+    console.log({ key, val, type, id });
+  });
+
+  const connection = client.isConnected();
+  const msgTemplate = (message: string) => `IPC test: ${message}`;
+  console.log(msgTemplate(arg));
+  event.reply('network', msgTemplate('hello'));
 });
 
 if (process.env.NODE_ENV === 'production') {
