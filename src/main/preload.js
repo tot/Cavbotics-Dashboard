@@ -2,25 +2,21 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
-    myPing() {
-      ipcRenderer.send('ipc-example', 'ping');
+    connect(event, args) {
+      ipcRenderer.invoke('connect', 'test network ipc');
     },
-    network(event, args) {
-      ipcRenderer.send('network', 'test network ipc');
+    setStatus(callback) {
+      ipcRenderer.on('connection-status', callback);
     },
-    on(channel, func) {
-      const validChannels = ['ipc-example'];
-      if (validChannels.includes(channel)) {
-        // Deliberately strip event as it includes `sender`
-        ipcRenderer.on(channel, (event, ...args) => func(...args));
-      }
+    // Get robot Info
+    getInfo(callback) {
+      ipcRenderer.invoke('getInfo', callback);
     },
-    once(channel, func) {
-      const validChannels = ['ipc-example'];
-      if (validChannels.includes(channel)) {
-        // Deliberately strip event as it includes `sender`
-        ipcRenderer.once(channel, (event, ...args) => func(...args));
-      }
+    testMessage(callback) {
+      ipcRenderer.on('test-message', callback);
+    },
+    connectionStatus(callback) {
+      ipcRenderer.on('connection-status', callback);
     },
   },
 });

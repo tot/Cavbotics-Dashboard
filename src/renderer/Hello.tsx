@@ -1,22 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 const Hello = () => {
+  useEffect(() => {
+    window.electron.ipcRenderer.testMessage((event, value) => {
+      console.log(value);
+    });
+
+    window.electron.ipcRenderer.connectionStatus((event, value) => {
+      console.log(`${event}, ${value}`);
+    });
+  });
   return (
     <div>
       <div className="Hello">Hello</div>
       <h1>electron-react-boilerplate</h1>
       <div className="Hello">
-        <button type="button">
-          <span role="img" aria-label="books">
-            📚
-          </span>
-          Read our docs
+        <button type="button">Read our docs</button>
+        <button
+          type="button"
+          onClick={async () => {
+            window.electron.ipcRenderer.connect();
+          }}
+        >
+          dsada
         </button>
         <button
           type="button"
-          onClick={() => window.electron.ipcRenderer.network()}
+          onClick={() => {
+            window.electron.ipcRenderer.getInfo('test');
+          }}
         >
-          dsada
+          print keys
         </button>
       </div>
     </div>

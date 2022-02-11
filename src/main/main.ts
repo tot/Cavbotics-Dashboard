@@ -12,8 +12,6 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -21,37 +19,7 @@ const ntClient = require('wpilib-nt-client');
 
 const client = new ntClient.Client();
 
-export default class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
-
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
-
-ipcMain.on('network', async (event, arg) => {
-  console.log('hello');
-  client.start((isConnected: any, err: any) => {
-    console.log({ isConnected, err });
-  }, 'roborio-8590.local');
-
-  client.addListener((key, val, type, id) => {
-    console.log({ key, val, type, id });
-  });
-
-  const connection = client.isConnected();
-  const msgTemplate = (message: string) => `IPC test: ${message}`;
-  console.log(msgTemplate(arg));
-  event.reply('network', msgTemplate('hello'));
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -126,10 +94,6 @@ const createWindow = async () => {
     event.preventDefault();
     shell.openExternal(url);
   });
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**
@@ -155,3 +119,25 @@ app
     });
   })
   .catch(console.log);
+
+ipcMain.handle('connect', async (event, arg) => {
+  console.log('connecting');
+  console.log(`handle ${event}, ${arg}`);
+  const connection = true;
+  // client.start((isConnected: any, err: any) => {
+  //   console.log({ isConnected, err });
+  // }, '10.85.90.2');
+
+  // client.addListener((key, val, type, id) => {
+  //   console.log({ key, val, type, id });
+  // });
+
+  // const connection = client.isConnected();
+  mainWindow?.webContents.send('connection-status', { status: connection });
+});
+
+ipcMain.handle('getInfo', async (event, arg) => {
+  const keys = client.getKeyID();
+  console.log(keys);
+  mainWindow?.webContents.send('test-message', { success: true });
+});

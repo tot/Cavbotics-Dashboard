@@ -1,14 +1,15 @@
 import React from 'react';
 import { MemoryRouter as Router, Switch, Route } from 'react-router-dom';
 import Hello from './Hello';
+import Login from './pages/Login/Login';
 // import icon from '../../assets/icon.svg';
-import './App.css';
 
 const App = () => {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={Hello} />
+        <Route path="/" exact component={Login} />
+        <Route path="/home" component={Hello} />
       </Switch>
     </Router>
   );
