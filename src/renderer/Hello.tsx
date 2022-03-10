@@ -7,7 +7,7 @@ const Hello = () => {
     });
 
     window.electron.ipcRenderer.connectionStatus((event, value) => {
-      console.log(`${event}, ${value}`);
+      console.log(`abcc ${event}, ${value}`);
     });
   });
   return (
