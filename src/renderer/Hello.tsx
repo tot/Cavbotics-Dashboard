@@ -1,37 +1,27 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const Hello = () => {
-  useEffect(() => {
-    window.electron.ipcRenderer.testMessage((event, value) => {
-      console.log(value);
-    });
-
-    window.electron.ipcRenderer.connectionStatus((event, value) => {
-      console.log(`abcc ${event}, ${value}`);
-    });
-  });
+  const [data, updateData] = useState<any>();
   return (
     <div>
       <div className="Hello">Hello</div>
       <h1>electron-react-boilerplate</h1>
       <div className="Hello">
         <button type="button">Read our docs</button>
+        {/* Start fetch button api */}
         <button
           type="button"
           onClick={async () => {
-            window.electron.ipcRenderer.connect();
+            const res = await fetch('https://randomuser.me/api/');
+            console.log(res);
+            const json = await res.json();
+            console.log(json);
+            updateData(json.results[0]);
           }}
         >
-          dsada
+          fetch data
         </button>
-        <button
-          type="button"
-          onClick={() => {
-            window.electron.ipcRenderer.getInfo('test');
-          }}
-        >
-          print keys
-        </button>
+        {data && data.email}
       </div>
     </div>
   );

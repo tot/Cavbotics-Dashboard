@@ -14,12 +14,6 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-// let exec = require('child_process').exec,
-//   child;
-
-const ntClient = require('wpilib-nt-client');
-
-const client = new ntClient.Client();
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -121,38 +115,3 @@ app
     });
   })
   .catch(console.log);
-
-ipcMain.handle('connect', async (event, arg) => {
-  // child = exec(
-  //   'C:\\Users\\Public\\wpilib\\2022\\jdk\\bin\\java.exe -jar C:\\Users\\green\\Documents\\Github\\Cavbotics-Dashboard\\nt-client\\ntclient.jar',
-  //   function (error, stdout, stderr) {
-  //     console.log('stdout: ' + stdout);
-  //     console.log('stderr: ' + stderr);
-  //     if (error !== null) {
-  //       console.log('exec error: ' + error);
-  //     }
-  //   }
-  // );
-  // console.log('connecting');
-  // client.start((isConnected, err) => {
-  //   console.log({ isConnected, err });
-  // }, '10.85.90.2');
-  // console.log(`handle ${event}, ${arg}`);
-  // client.start((isConnected: any, err: any) => {
-  //   console.log({ isConnected, err });
-  //   console.log('work');
-  // }, '10.85.90.2');
-  // client.addListener((key, val, type, id) => {
-  //   console.log({ key, val, type, id });
-  // });
-  // const connection = client.isConnected();
-  // console.log(await client.isConnected);
-  // mainWindow?.webContents.send('connection-status', { status: connection });
-});
-
-ipcMain.handle('getInfo', async (event, arg) => {
-  const keys = client.getKeyID('/SmartDashboard/DB/Button 0');
-  client.Assign(false, 'test/lol', true);
-  console.log(keys);
-  mainWindow?.webContents.send('test-message', { success: true });
-});
