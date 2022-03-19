@@ -1,6 +1,6 @@
 import { FiClock, FiCrosshair, FiEye, FiSettings } from 'react-icons/fi';
-import ConfigurationCard from './components/ConfigurationCard/ConfigurationCard';
-import InfoCard from './components/InfoCard/InfoCard';
+import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
+import InfoCard from '../../components/InfoCard/InfoCard';
 
 const Home: React.FC = () => {
   return (
@@ -14,12 +14,17 @@ const Home: React.FC = () => {
           </p>
         </div>
         <div className="">
-          <h1 className="font-normal text-green-500 flex items-center">
+          {/* <h1 className="font-normal text-green-500 flex items-center">
             <div className="relative w-4 h-4 bg-green-500/20 rounded-full mr-2">
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-green-500" />
             </div>
             Connected
-          </h1>
+          </h1> */}
+          <span className="text-base font-normal text-neutral-400">Webcam</span>{' '}
+          <span className="px-2 text-neutral-700/50">|</span>{' '}
+          <span className="text-base font-normal text-neutral-400">
+            Limelight
+          </span>
         </div>
       </div>
       {/* <h1 className="text-neutral-300 text-base font-normal flex items-center mt-2">
@@ -44,7 +49,7 @@ const Home: React.FC = () => {
         />
       </div>
       <div className="flex w-full flex-1">
-        <div className="grid grid-cols-3 w-full gap-6">
+        <div className="grid grid-cols-2 w-full gap-6">
           <div className="col-span-1 flex flex-col">
             <h1 className="text-neutral-300 text-base font-normal">
               Configuration
@@ -142,12 +147,45 @@ const Home: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="">
+          {/* <div className="">
             <h1 className="text-neutral-300 text-base font-normal">Camera</h1>
-            <div className="mt-4 w-full h-72 bg-teal-800 flex items-center justify-center">
-              Camera feed
+            <div className="grid grid-cols-1 gap-4 mt-4">
+              <button
+                type="button"
+                className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                onClick={() => console.log('open livewindow webcam')}
+              >
+                Open webcam feed
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 bg-green-600 text-white rounded-md"
+                onClick={() => console.log('open limelight webcam')}
+              >
+                Open Limelight feed
+              </button>
             </div>
-          </div>
+            <div className="mt-4 w-full h-48 relative flex items-center justify-center">
+              <p className="absolute inset-0 text-white">
+                Limelight camera feed
+              </p>
+              <img
+                src="http://10.85.90.2:1181/stream.mjpg"
+                className="w-full h-full relative z-10"
+                alt="Live camera feed"
+              />
+            </div>
+            <div className="mt-4 w-full h-48 relative flex items-center justify-center">
+              <p className="absolute inset-0 text-white">
+                Limelight camera feed
+              </p>
+              <img
+                src="http://10.85.90.39:5800/stream.mjpg"
+                className="w-full h-full relative z-10"
+                alt="Live camera feed"
+              />
+            </div>
+          </div> */}
         </div>
       </div>
     </div>

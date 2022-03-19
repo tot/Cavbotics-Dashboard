@@ -58,18 +58,15 @@ const Limelight = () => {
         className="text-white bg-blue-500"
         type="button"
         onClick={async () => {
-          const res = await axios.post(
-            'http://127.0.0.1:8883/double/set',
-            data
-          );
-          console.log(await res.data);
-          //   const response = await fetch('http://127.0.0.1:8883/double/set', {
-          //     method: 'post',
-          //     body: JSON.stringify(data),
-          //     headers: { 'Content-Type': 'application/json' },
-          //   });
-          // const dataa = await response.json();
-          // console.log(dataa);
+          try {
+            const res = await axios.post(
+              'http://127.0.0.1:8883/double/set',
+              data
+            );
+            console.log(await res.data);
+          } catch (e) {
+            console.log(e);
+          }
         }}
       >
         make request
