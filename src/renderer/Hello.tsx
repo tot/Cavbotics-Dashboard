@@ -1,7 +1,4 @@
-import { useEffect, useState } from 'react';
-
-const Hello = () => {
-  const [data, updateData] = useState<any>();
+const Hello: React.FC = () => {
   return (
     <div>
       <div className="Hello bg-red-500">Hello</div>
@@ -11,17 +8,12 @@ const Hello = () => {
         {/* Start fetch button api */}
         <button
           type="button"
-          onClick={async () => {
-            const res = await fetch('https://randomuser.me/api/');
-            console.log(res);
-            const json = await res.json();
-            console.log(json);
-            updateData(json.results[0]);
+          onClick={() => {
+            console.log('ds');
           }}
         >
           fetch data
         </button>
-        {data && data.email}
       </div>
     </div>
   );
