@@ -1,6 +1,6 @@
 interface Props {
   label: string;
-  status: string;
+  status: boolean;
 }
 
 const StatusCard: React.FC<Props> = ({ label, status }: Props) => {
