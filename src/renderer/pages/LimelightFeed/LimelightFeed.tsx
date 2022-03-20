@@ -5,7 +5,7 @@ const LimelightFeed = () => {
         <p className="absolute inset-0 text-white">Limelight camera feed</p>
         <img
           src="http://10.85.90.39:5800/stream.mjpg"
-          className="w-full h-full relative z-10"
+          className="w-full h-72 relative z-10"
           alt="Limelight camera feed"
         />
       </div>

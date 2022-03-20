@@ -12,8 +12,7 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-// readd
-// import MenuBuilder from './menu';
+import MenuBuilder from './menu'; // eslint-disable-line
 import { resolveHtmlPath } from './util';
 
 let mainWindow: BrowserWindow | null = null;
@@ -151,8 +150,8 @@ export default async function createNewWindow() {
   ) {
     await installExtensions();
   }
-  // fix
-  // let x, y;
+  let x;
+  let y;
 
   const currentWindow = BrowserWindow.getFocusedWindow();
   if (currentWindow) {

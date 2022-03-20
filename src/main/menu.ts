@@ -6,7 +6,7 @@ import {
   MenuItemConstructorOptions,
 } from 'electron';
 
-// import { createNewWindow } from './main';
+import createNewWindow from './main'; // eslint-disable-line
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -215,7 +215,7 @@ export default class MenuBuilder {
             accelerator: 'Shift+Command+N',
             click: () => {
               // re aadd
-              // createNewWindow();
+              createNewWindow();
             },
           },
         ],
