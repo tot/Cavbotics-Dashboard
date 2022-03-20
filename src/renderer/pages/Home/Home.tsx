@@ -1,10 +1,19 @@
+import { useEffect } from 'react';
+import axios from 'axios';
 import { FiClock, FiCrosshair, FiEye, FiSettings } from 'react-icons/fi';
 import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
 import InfoCard from '../../components/InfoCard/InfoCard';
 
-// import { remote } from 'electron';
-
 const Home: React.FC = () => {
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const res = await axios('http://127.0.0.1:8883/getall');
+  //     const data = await res.data;
+  //     console.log(data);
+  //   };
+  //   fetchData();
+  // }, []);
+
   const openWebcamWindow = async () => {
     await window.electron.ipcRenderer.openWebcam();
   };
@@ -30,7 +39,13 @@ const Home: React.FC = () => {
           </h1> */}
           <button
             type="button"
-            onClick={() => openWebcamWindow()}
+            onClick={async () => {
+              // const fetchData = async () => {
+              const res = await axios('http://127.0.0.1:8883/getall');
+              const data = await res.data;
+              console.log(data);
+              // };
+            }}
             className="text-base font-normal text-neutral-400 border-none outline-none"
           >
             Webcam

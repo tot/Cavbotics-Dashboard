@@ -6,6 +6,8 @@ import {
   MenuItemConstructorOptions,
 } from 'electron';
 
+// import { createNewWindow } from './main';
+
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
   submenu?: DarwinMenuItemConstructorOptions[] | Menu;
@@ -206,6 +208,14 @@ export default class MenuBuilder {
             accelerator: 'Ctrl+W',
             click: () => {
               this.mainWindow.close();
+            },
+          },
+          {
+            label: 'New Window',
+            accelerator: 'Shift+Command+N',
+            click: () => {
+              // re aadd
+              // createNewWindow();
             },
           },
         ],

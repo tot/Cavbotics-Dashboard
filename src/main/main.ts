@@ -11,8 +11,9 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, remote } from 'electron';
-import MenuBuilder from './menu';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
+// readd
+// import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
 let mainWindow: BrowserWindow | null = null;
@@ -142,3 +143,52 @@ ipcMain.handle('open:limelight', async () => {
   });
   limelightwin.loadURL(resolveHtmlPath('index.html'));
 });
+
+export default async function createNewWindow() {
+  if (
+    process.env.NODE_ENV === 'development' ||
+    process.env.DEBUG_PROD === 'true'
+  ) {
+    await installExtensions();
+  }
+  // fix
+  // let x, y;
+
+  const currentWindow = BrowserWindow.getFocusedWindow();
+  if (currentWindow) {
+    const [currentWindowX, currentWindowY] = currentWindow.getPosition();
+    x = currentWindowX + 24;
+    y = currentWindowY + 24;
+  }
+  let newWindow: BrowserWindow | null = null;
+  newWindow = new BrowserWindow({
+    show: false,
+    width: 1200,
+    height: 812,
+    x,
+    y,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+  });
+  newWindow.loadURL(resolveHtmlPath('index.html'));
+  newWindow.webContents.on('did-finish-load', () => {
+    if (!newWindow) {
+      throw new Error('"newWindow" is not defined');
+    }
+    if (process.env.START_MINIMIZED) {
+      newWindow.minimize();
+    } else {
+      newWindow.show();
+      newWindow.focus();
+    }
+  });
+  newWindow.on('closed', () => {
+    newWindow = null;
+  });
+  newWindow.on('focus', () => {
+    const menuBuilder = new MenuBuilder(newWindow);
+    menuBuilder.buildMenu();
+  });
+  return newWindow;
+}
