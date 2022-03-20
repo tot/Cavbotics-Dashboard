@@ -1,5 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
-  ipcRenderer: {},
+  ipcRenderer: {
+    openWebcam: async () => ipcRenderer.invoke('open:webcam'),
+    openLimelight: async () => ipcRenderer.invoke('open:limelight'),
+  },
 });

@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, remote } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -116,3 +116,29 @@ app
     });
   })
   .catch(console.log);
+
+ipcMain.handle('open:webcam', async () => {
+  await installExtensions();
+  const webcamwin = new BrowserWindow({
+    height: 600,
+    width: 800,
+    frame: true,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+  });
+  webcamwin.loadURL(resolveHtmlPath('index.html'));
+});
+
+ipcMain.handle('open:limelight', async () => {
+  await installExtensions();
+  const limelightwin = new BrowserWindow({
+    height: 600,
+    width: 800,
+    frame: true,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+  });
+  limelightwin.loadURL(resolveHtmlPath('index.html'));
+});

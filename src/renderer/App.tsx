@@ -4,6 +4,8 @@ import Limelight from './pages/Limelight/Limelight';
 import Autonomous from './pages/Autonomous/Autonomous';
 import PID from './pages/PID/PID';
 import Shooter from './pages/Shooter/Shooter';
+import WebcamFeed from './pages/WebcamFeed/WebcamFeed';
+import LimelightFeed from './pages/LimelightFeed/LimelightFeed';
 import Login from './pages/Login/Login';
 
 const App = () => {
@@ -16,6 +18,8 @@ const App = () => {
         <Route path="/autonomous" exact component={Autonomous} />
         <Route path="/shooter" exact component={Shooter} />
         <Route path="/pid" exact component={PID} />
+        <Route path="/limelightfeed" exact component={LimelightFeed} />
+        <Route path="/webcamfeed" exact component={WebcamFeed} />
       </Switch>
     </Router>
   );

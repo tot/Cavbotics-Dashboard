@@ -2,7 +2,15 @@ import { FiClock, FiCrosshair, FiEye, FiSettings } from 'react-icons/fi';
 import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
 import InfoCard from '../../components/InfoCard/InfoCard';
 
+// import { remote } from 'electron';
+
 const Home: React.FC = () => {
+  const openWebcamWindow = async () => {
+    await window.electron.ipcRenderer.openWebcam();
+  };
+  const openLimelightWindow = async () => {
+    await window.electron.ipcRenderer.openLimelight();
+  };
   return (
     <div className="w-screen h-screen bg-neutral-900 p-4 flex flex-col">
       {/* <h1 className="text-xl text-white font-medium">Dashboard</h1> */}
@@ -20,11 +28,21 @@ const Home: React.FC = () => {
             </div>
             Connected
           </h1> */}
-          <span className="text-base font-normal text-neutral-400">Webcam</span>{' '}
+          <button
+            type="button"
+            onClick={() => openWebcamWindow()}
+            className="text-base font-normal text-neutral-400 border-none outline-none"
+          >
+            Webcam
+          </button>{' '}
           <span className="px-2 text-neutral-700/50">|</span>{' '}
-          <span className="text-base font-normal text-neutral-400">
+          <button
+            type="button"
+            onClick={() => openLimelightWindow()}
+            className="text-base font-normal text-neutral-400 border-none outline-none"
+          >
             Limelight
-          </span>
+          </button>
         </div>
       </div>
       {/* <h1 className="text-neutral-300 text-base font-normal flex items-center mt-2">
