@@ -6,18 +6,18 @@ import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationC
 import InfoCard from '../../components/InfoCard/InfoCard';
 
 const Home: React.FC = () => {
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios('http://127.0.0.1:8883/getall');
-        const data = await res.data;
-        console.log(data);
-      } catch (e: Error) {
-        console.log(e);
-      }
-    };
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await axios('http://127.0.0.1:8883/getall');
+  //       const data = await res.data;
+  //       console.log(data);
+  //     } catch (e: Error) {
+  //       console.log(e);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   return (
     <div className="w-screen h-screen bg-neutral-900 p-4 flex flex-col">
