@@ -45,6 +45,11 @@ const configuration: webpack.Configuration = {
       'regenerator-runtime/runtime',
       path.join(webpackPaths.srcRendererPath, 'limelightwindow/index.tsx'),
     ],
+    webcamwindow: [
+      'core-js',
+      'regenerator-runtime/runtime',
+      path.join(webpackPaths.srcRendererPath, 'webcamwindow/index.tsx'),
+    ],
   },
 
   output: {
@@ -157,6 +162,22 @@ const configuration: webpack.Configuration = {
         'limelightwindow/index.ejs'
       ),
       chunks: ['limelightwindow'],
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+    }),
+
+    new HtmlWebpackPlugin({
+      filename: 'webcamwindow/index.html',
+      template: path.join(
+        webpackPaths.srcRendererPath,
+        'webcamwindow/index.ejs'
+      ),
+      chunks: ['webcamwindow'],
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,

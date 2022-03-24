@@ -83,6 +83,7 @@ const Home: React.FC = () => {
         </div>
         <div className="">
           <button
+            onClick={() => window.electron.ipcRenderer.openWebcam()}
             type="button"
             className="text-base font-normal text-neutral-400 border-none outline-none"
           >

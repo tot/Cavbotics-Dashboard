@@ -27,6 +27,7 @@ export default class AppUpdater {
 
 let mainwindow: BrowserWindow | null = null;
 let limelightwindow: BrowserWindow | null = null;
+let webcamwindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -183,6 +184,56 @@ ipcMain.handle('open:limelight', async () => {
   });
 
   const menuBuilder2 = new MenuBuilder(limelightwindow);
+
+  menuBuilder2.buildMenu();
+});
+
+ipcMain.handle('open:webcam', async () => {
+  if (isDevelopment) {
+    await installExtensions();
+  }
+
+  const RESOURCES_PATH = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(__dirname, '../../assets');
+
+  const getAssetPath = (...paths: string[]): string => {
+    return path.join(RESOURCES_PATH, ...paths);
+  };
+
+  webcamwindow = new BrowserWindow({
+    show: false,
+    width: 1024,
+    height: 728,
+    icon: getAssetPath('icon.png'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
+  webcamwindow.loadURL(resolveHtmlPath('webcamwindow/index.html'));
+
+  webcamwindow.on('ready-to-show', () => {
+    if (!webcamwindow) {
+      throw new Error('"webcamwindow" is not defined');
+    }
+    if (process.env.START_MINIMIZED) {
+      webcamwindow.minimize();
+    } else {
+      webcamwindow.show();
+    }
+  });
+
+  webcamwindow.on('closed', () => {
+    mainwindow = null;
+  });
+
+  // Open urls in the user's browser
+  webcamwindow.webContents.on('new-window', (event, url) => {
+    event.preventDefault();
+    shell.openExternal(url);
+  });
+
+  const menuBuilder2 = new MenuBuilder(webcamwindow);
 
   menuBuilder2.buildMenu();
 });
