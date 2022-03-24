@@ -1,50 +1,86 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { FiClock, FiCrosshair, FiEye, FiSettings } from 'react-icons/fi';
+import {
+  FiClock,
+  FiCrosshair,
+  FiEye,
+  FiRefreshCcw,
+  FiSettings,
+} from 'react-icons/fi';
+
+import StatusCard from '../../components/StatusCard/StatusCard';
 import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
 import InfoCard from '../../components/InfoCard/InfoCard';
 
 const Home: React.FC = () => {
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await axios('http://127.0.0.1:8883/getall');
-  //       const data = await res.data;
-  //       console.log(data);
-  //     } catch (e: Error) {
-  //       console.log(e);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
+  const [connection, setConnection] = useState(false);
+  const [keys, setKeys] = useState({});
+  useEffect(() => {
+    const fetchConnection = async () => {
+      try {
+        const res = await axios('http://127.0.0.1:8883/getconnection');
+        const data = await res.data;
+        if (res.data.Connected) {
+          setConnection(true);
+        } else setConnection(false);
+        console.log(data);
+      } catch (e) {
+        console.log(e);
+        setConnection(false);
+      }
+    };
+    setTimeout(() => {
+      fetchConnection();
+    }, 10000);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios('http://127.0.0.1:8883/getall');
+        const data = await res.data;
+        setKeys(res.data.data);
+        console.log(data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchData();
+    // setTimeout(() => {
+    //   fetchData();
+    // }, 5000);
+  }, []);
 
   return (
     <div className="w-screen h-screen bg-neutral-900 p-4 flex flex-col">
-      {/* <h1 className="text-xl text-white font-medium">Dashboard</h1> */}
       <div className="mb-6 pb-4 border-b border-neutral-700 text-base text-white font-semibold flex justify-between items-center">
         <div className="">
-          <p className="text-base text-white">
-            Cavbotics{' '}
-            <span className="text-sm text-neutral-400 font-normal">#8590</span>
-          </p>
+          <div className="text-base text-white flex items-center">
+            <span>
+              Cavbotics{' '}
+              <span className="text-sm text-neutral-400 font-normal">
+                #8590
+              </span>
+            </span>
+            <h1 className="font-normal flex items-center">
+              <div
+                className={`ml-2 relative w-4 h-4 ${
+                  connection ? 'bg-green-500/20' : 'bg-amber-500/20'
+                }  rounded-full mr-2`}
+              >
+                <div
+                  className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${
+                    connection ? 'bg-green-500' : 'bg-amber-500'
+                  }`}
+                />
+              </div>
+            </h1>
+          </div>
         </div>
         <div className="">
-          {/* <h1 className="font-normal text-green-500 flex items-center">
-            <div className="relative w-4 h-4 bg-green-500/20 rounded-full mr-2">
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-green-500" />
-            </div>
-            Connected
-          </h1> */}
           <Link
             to="/webcamfeed"
-            // onClick={async () => {
-            //   // const fetchData = async () => {
-            //   const res = await axios('http://127.0.0.1:8883/getall');
-            //   const data = await res.data;
-            //   console.log(data);
-            //   // };
-            // }}
             className="text-base font-normal text-neutral-400 border-none outline-none"
           >
             Webcam
@@ -58,26 +94,19 @@ const Home: React.FC = () => {
           </Link>
         </div>
       </div>
-      {/* <h1 className="text-neutral-300 text-base font-normal flex items-center mt-2">
-        Details <div className="h-0.5 ml-4 flex-grow bg-neutral-700/60" />
-      </h1> */}
       <div className="grid grid-cols-4 mb-6 mt-2 gap-4">
         <InfoCard label="Robot IP" info="10.85.90.11" color="border-blue-500" />
         <InfoCard
           label="Battery Percentage"
-          info="85%"
+          info="--"
           color="border-teal-500"
         />
         <InfoCard
           label="Current Runtime"
-          info="32.03 seconds"
+          info="--"
           color="border-emerald-500"
         />
-        <InfoCard
-          label="Current Runtime"
-          info="32.03 seconds"
-          color="border-green-500"
-        />
+        <InfoCard label="Unavailable" info="--" color="border-amber-500" />
       </div>
       <div className="flex w-full flex-1">
         <div className="grid grid-cols-2 w-full gap-6">
@@ -131,50 +160,53 @@ const Home: React.FC = () => {
             </div>
           </div>
           <div className="rounded-md border-neutral-700/60 flex flex-col">
-            <h1 className="text-neutral-300 text-base font-normal">
-              Robot Statuses
-            </h1>
-            <div className="relative flex flex-1">
-              <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4">
+            <div className="flex justify-between">
+              <h1 className="text-neutral-300 text-base font-normal flex items-center">
+                Robot Statuses
                 <button
                   type="button"
-                  className="w-full rounded-md bg-neutral-700/20 p-4 flex justify-between"
+                  onClick={async () => {
+                    try {
+                      const res = await axios('http://127.0.0.1:8883/getall');
+                      const data = await res.data;
+                      setKeys(res.data.data);
+                      console.log(data.data);
+                    } catch (e) {
+                      console.log(e);
+                    }
+                  }}
                 >
-                  <p className="text-white text-base">Limelight</p>
-                  <p className="text-emerald-500">On</p>
+                  <FiRefreshCcw className="text-neutral-300 ml-2" size={18} />
                 </button>
-                <div className="w-full rounded-md bg-neutral-700/20 p-4 flex justify-between">
-                  <p className="text-white text-base">Shooter</p>
-                  <p className="text-emerald-500">On</p>
-                </div>
-                <div className="w-full rounded-md bg-neutral-700/20 p-4 flex justify-between">
-                  <p className="text-white text-base">Intake</p>
-                  <p className="text-emerald-500">On</p>
-                </div>
-                <div className="w-full rounded-md bg-neutral-700/20 p-4 flex justify-between">
-                  <p className="text-white text-base">Swerve</p>
-                  <p className="text-emerald-500">On</p>
-                </div>
-                <div className="w-full rounded-md bg-neutral-700/20 p-4 flex justify-between">
-                  <p className="text-white text-base">Climber Retract</p>
-                  <p className="text-emerald-500">On</p>
-                </div>
-                <div className="w-full rounded-md bg-neutral-700/20 p-4 flex justify-between">
-                  <p className="text-white text-base">Climber Extend</p>
-                  <p className="text-emerald-500">On</p>
-                </div>
-                <div className="w-full rounded-md bg-neutral-700/20 p-4 flex justify-between">
-                  <p className="text-white text-base">Climber Extend</p>
-                  <p className="text-emerald-500">On</p>
-                </div>
-                <div className="w-full rounded-md bg-neutral-700/20 p-4 flex justify-between">
-                  <p className="text-white text-base">Climber Extend</p>
-                  <p className="text-emerald-500">On</p>
-                </div>
-                <div className="w-full rounded-md bg-neutral-700/20 p-4 flex justify-between">
-                  <p className="text-white text-base">Climber Extend</p>
-                  <p className="text-emerald-500">On</p>
-                </div>
+              </h1>
+            </div>
+            <div className="relative flex flex-1">
+              <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4">
+                {Object.keys(keys).length <= 0 ? (
+                  <p className="text-neutral-300">
+                    Could not retrieve statuses
+                  </p>
+                ) : (
+                  <>
+                    {/* <p className="text-neutral-300">Display statuses</p> */}
+                    <StatusCard
+                      label="ShootCommand"
+                      status={keys.ShootCommand}
+                    />
+                    <StatusCard
+                      label="IntakeCommand"
+                      status={keys.IntakeCommand}
+                    />
+                    <StatusCard
+                      label="OuterIndexCommand"
+                      status={keys.OuterIndexCommand}
+                    />
+                    <StatusCard
+                      label="InnerIndexCommand"
+                      status={keys.InnerIndexCommand}
+                    />
+                  </>
+                )}
               </div>
             </div>
           </div>

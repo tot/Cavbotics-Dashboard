@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
@@ -7,6 +7,23 @@ const PID = () => {
   const [P, setP] = useState(0);
   const [I, setI] = useState(0);
   const [D, setD] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios('http://127.0.0.1:8883/getall');
+        const data = await res.data;
+        setP(res.data.P);
+        setI(res.data.I);
+        setD(res.data.D);
+
+        console.log(data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="w-screen h-screen bg-neutral-900 flex flex-col p-4">

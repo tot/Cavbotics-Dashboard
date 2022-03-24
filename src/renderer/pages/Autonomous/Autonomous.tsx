@@ -1,13 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 const Autonomous = () => {
-  const [data, setData] = useState<any>({
-    key: 'routine',
-    value: 0,
-  });
+  const [routine, setRoutine] = useState<number>(1);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios('http://127.0.0.1:8883/getall');
+        const data = await res.data;
+        setRoutine(res.data.routine);
+        console.log(data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const displayRoutine = () => {
+    if (routine === 0) return 'One ball';
+    if (routine === 1) return 'Two ball';
+    if (routine === 2) return 'Nothing';
+    return 'No routine';
+  };
 
   return (
     <div className="w-screen h-screen bg-neutral-900 flex flex-col p-4">
@@ -22,12 +40,24 @@ const Autonomous = () => {
         </p>
       </div>
       <div className="pt-8">
+        <p className="text-neutral-300 pb-4">
+          Current routine: {displayRoutine()}
+        </p>
         <div className="flex items-center space-x-4">
           <button
             type="button"
             className="inline-block px-4 py-2 rounded-md bg-neutral-700 text-white"
-            onClick={() => {
-              setData({ ...data, value: 0 });
+            onClick={async () => {
+              try {
+                const res = await axios.post(
+                  'http://127.0.0.1:8883/double/set',
+                  { key: 'routine', value: 0 }
+                );
+                console.log(await res.data);
+                setRoutine(0);
+              } catch (e) {
+                console.log(e);
+              }
             }}
           >
             Single Ball Routine
@@ -35,39 +65,40 @@ const Autonomous = () => {
           <button
             type="button"
             className="inline-block px-4 py-2 rounded-md bg-neutral-700 text-white"
-            onClick={() => {
-              setData({ ...data, value: 1 });
+            onClick={async () => {
+              try {
+                const res = await axios.post(
+                  'http://127.0.0.1:8883/double/set',
+                  { key: 'routine', value: 1 }
+                );
+                console.log(await res.data);
+                setRoutine(1);
+              } catch (e) {
+                console.log(e);
+              }
             }}
           >
-            Two Ball Routine
+            Two Ball Routine (default)
           </button>
           <button
             type="button"
             className="inline-block px-4 py-2 rounded-md bg-neutral-700 text-white"
-            onClick={() => {
-              setData({ ...data, value: 2 });
+            onClick={async () => {
+              try {
+                const res = await axios.post(
+                  'http://127.0.0.1:8883/double/set',
+                  { key: 'routine', value: 2 }
+                );
+                console.log(await res.data);
+                setRoutine(2);
+              } catch (e) {
+                console.log(e);
+              }
             }}
           >
-            Three Ball Routine
+            Do nothing
           </button>
         </div>
-        <button
-          className="text-white bg-blue-500 mt-4 py-2 px-4 rounded"
-          type="button"
-          onClick={async () => {
-            try {
-              const res = await axios.post(
-                'http://127.0.0.1:8883/double/set',
-                data
-              );
-              console.log(await res.data);
-            } catch (e) {
-              consolee.log(e);
-            }
-          }}
-        >
-          Apply changes
-        </button>
       </div>
     </div>
   );
