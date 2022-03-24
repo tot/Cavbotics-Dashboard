@@ -14,6 +14,8 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { spawn } from 'child_process';
+import { kill } from 'tree-kill';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -24,6 +26,10 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
+const child = spawn('java', ['-jar', `${app.getAppPath()}\\server.jar`, '']);
+console.log(app.getAppPath());
+
+kill(child.pid);
 
 let mainwindow: BrowserWindow | null = null;
 let limelightwindow: BrowserWindow | null = null;
@@ -133,7 +139,9 @@ app
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (mainwindow === null) createWindow();
+      if (mainwindow === null) {
+        createWindow();
+      }
     });
   })
   .catch(console.log);

@@ -12,13 +12,51 @@ import StatusCard from '../../components/StatusCard/StatusCard';
 import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
 import InfoCard from '../../components/InfoCard/InfoCard';
 
-// interface Keys {
-
-// }
+interface Keys {
+  DeclineHoodCommand: boolean;
+  DoNothingCommand: boolean;
+  ExtendClimberCommand: boolean;
+  ledMode: number;
+  HoodCommand: boolean;
+  InnerIndexCommand: boolean;
+  IntakeCommand: boolean;
+  KickOutBallsCommand: boolean;
+  OneBallAuto: boolean;
+  OuterIndexCommand: boolean;
+  RaiseHoodCommand: boolean;
+  RetractClimberCode: boolean;
+  ShootCommand: boolean;
+  SwerveCommand: boolean;
+  routine: number;
+  P: number;
+  I: number;
+  D: number;
+  shooterMode: number;
+}
 
 const Home: React.FC = () => {
   const [connection, setConnection] = useState(false);
-  const [keys, setKeys] = useState({});
+  const [keys, setKeys] = useState<Keys>({
+    DeclineHoodCommand: false,
+    DoNothingCommand: false,
+    ExtendClimberCommand: false,
+    ledMode: 0,
+    HoodCommand: false,
+    InnerIndexCommand: false,
+    IntakeCommand: false,
+    KickOutBallsCommand: false,
+    OneBallAuto: false,
+    OuterIndexCommand: false,
+    RaiseHoodCommand: false,
+    RetractClimberCode: false,
+    ShootCommand: false,
+    SwerveCommand: false,
+    routine: 0,
+    P: 0,
+    I: 0,
+    D: 0,
+    shooterMode: 0,
+  });
   useEffect(() => {
     const fetchConnection = async () => {
       try {
@@ -187,7 +225,10 @@ const Home: React.FC = () => {
             </div>
             <div className="relative flex flex-1">
               <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4">
-                ds
+                <StatusCard
+                  label="DeclineHoodCommand"
+                  status={keys.DeclineHoodCommand}
+                />
               </div>
             </div>
           </div>
