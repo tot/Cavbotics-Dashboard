@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Build config for electron renderer process
  */
@@ -25,23 +27,30 @@ const devtoolsConfig =
       }
     : {};
 
-export default merge(baseConfig, {
+const configuration: webpack.Configuration = {
   ...devtoolsConfig,
 
   mode: 'production',
 
   target: ['web', 'electron-renderer'],
 
-  entry: [
-    'core-js',
-    'regenerator-runtime/runtime',
-    path.join(webpackPaths.srcRendererPath, 'index.tsx'),
-  ],
+  entry: {
+    mainwindow: [
+      'core-js',
+      'regenerator-runtime/runtime',
+      path.join(webpackPaths.srcRendererPath, 'mainwindow/index.tsx'),
+    ],
+    limelightwindow: [
+      'core-js',
+      'regenerator-runtime/runtime',
+      path.join(webpackPaths.srcRendererPath, 'limelightwindow/index.tsx'),
+    ],
+  },
 
   output: {
     path: webpackPaths.distRendererPath,
-    publicPath: './',
-    filename: 'renderer.js',
+    publicPath: '../',
+    filename: '[name].renderer.js',
     library: {
       type: 'umd',
     },
@@ -129,8 +138,25 @@ export default merge(baseConfig, {
     }),
 
     new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
+      filename: 'mainwindow/index.html',
+      template: path.join(webpackPaths.srcRendererPath, 'mainwindow/index.ejs'),
+      chunks: ['mainwindow'],
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+    }),
+
+    new HtmlWebpackPlugin({
+      filename: 'limelightwindow/index.html',
+      template: path.join(
+        webpackPaths.srcRendererPath,
+        'limelightwindow/index.ejs'
+      ),
+      chunks: ['limelightwindow'],
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
@@ -140,4 +166,6 @@ export default merge(baseConfig, {
       isDevelopment: process.env.NODE_ENV !== 'production',
     }),
   ],
-});
+};
+
+export default merge(baseConfig, configuration);

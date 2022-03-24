@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import path from 'path';
 import fs from 'fs';
 import webpack from 'webpack';
@@ -37,25 +39,34 @@ if (
   execSync('npm run postinstall');
 }
 
-export default merge(baseConfig, {
+const configuration: webpack.Configuration = {
   devtool: 'inline-source-map',
 
   mode: 'development',
 
   target: ['web', 'electron-renderer'],
 
-  entry: [
-    `webpack-dev-server/client?http://localhost:${port}/dist`,
-    'webpack/hot/only-dev-server',
-    'core-js',
-    'regenerator-runtime/runtime',
-    path.join(webpackPaths.srcRendererPath, 'index.tsx'),
-  ],
+  entry: {
+    mainwindow: [
+      `webpack-dev-server/client?http://localhost:${port}/dist`,
+      'webpack/hot/only-dev-server',
+      'core-js',
+      'regenerator-runtime/runtime',
+      path.join(webpackPaths.srcRendererPath, 'mainwindow/index.tsx'),
+    ],
+    limelightwindow: [
+      `webpack-dev-server/client?http://localhost:${port}/dist`,
+      'webpack/hot/only-dev-server',
+      'core-js',
+      'regenerator-runtime/runtime',
+      path.join(webpackPaths.srcRendererPath, 'limelightwindow/index.tsx'),
+    ],
+  },
 
   output: {
     path: webpackPaths.distRendererPath,
     publicPath: '/',
-    filename: 'renderer.dev.js',
+    filename: '[name].renderer.dev.js',
     library: {
       type: 'umd',
     },
@@ -141,9 +152,36 @@ export default merge(baseConfig, {
 
     new ReactRefreshWebpackPlugin(),
 
+    // FIXME: El problema es que tratamos de cargar index.ejs pero no existe
+    // por que se cambio el path a mainwindow/, ya no es hijo directo de src
     new HtmlWebpackPlugin({
-      filename: path.join('index.html'),
-      template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
+      /* filename: path.join('mainwindow/index.html'),
+      template: path.join(webpackPaths.srcRendererPath, 'mainwindow/index.ejs'), */
+
+      filename: path.join('mainwindow/index.html'),
+      template: path.join(webpackPaths.srcRendererPath, 'mainwindow/index.ejs'),
+      chunks: ['mainwindow'],
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      env: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+
+    new HtmlWebpackPlugin({
+      /* filename: path.join('mainwindow/index.html'),
+      template: path.join(webpackPaths.srcRendererPath, 'mainwindow/index.ejs'), */
+
+      filename: path.join('limelightwindow/index.html'),
+      template: path.join(
+        webpackPaths.srcRendererPath,
+        'limelightwindow/index.ejs'
+      ),
+      chunks: ['limelightwindow'],
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
@@ -171,7 +209,6 @@ export default merge(baseConfig, {
     },
     historyApiFallback: {
       verbose: true,
-      disableDotRule: false,
     },
     onBeforeSetupMiddleware() {
       console.log('Starting Main Process...');
@@ -184,4 +221,6 @@ export default merge(baseConfig, {
         .on('error', (spawnError) => console.error(spawnError));
     },
   },
-});
+};
+
+export default merge(baseConfig, configuration);

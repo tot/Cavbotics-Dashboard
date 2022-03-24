@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import {
   FiClock,
   FiCrosshair,
@@ -12,6 +11,10 @@ import {
 import StatusCard from '../../components/StatusCard/StatusCard';
 import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
 import InfoCard from '../../components/InfoCard/InfoCard';
+
+// interface Keys {
+
+// }
 
 const Home: React.FC = () => {
   const [connection, setConnection] = useState(false);
@@ -79,19 +82,20 @@ const Home: React.FC = () => {
           </div>
         </div>
         <div className="">
-          <Link
-            to="/webcamfeed"
+          <button
+            type="button"
             className="text-base font-normal text-neutral-400 border-none outline-none"
           >
             Webcam
-          </Link>{' '}
+          </button>{' '}
           <span className="px-2 text-neutral-700/50">|</span>{' '}
-          <Link
-            to="/limelightfeed"
+          <button
+            type="button"
+            onClick={() => window.electron.ipcRenderer.openLimelight()}
             className="text-base font-normal text-neutral-400 border-none outline-none"
           >
             Limelight
-          </Link>
+          </button>
         </div>
       </div>
       <div className="grid grid-cols-4 mb-6 mt-2 gap-4">
@@ -182,31 +186,7 @@ const Home: React.FC = () => {
             </div>
             <div className="relative flex flex-1">
               <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4">
-                {Object.keys(keys).length <= 0 ? (
-                  <p className="text-neutral-300">
-                    Could not retrieve statuses
-                  </p>
-                ) : (
-                  <>
-                    {/* <p className="text-neutral-300">Display statuses</p> */}
-                    <StatusCard
-                      label="ShootCommand"
-                      status={keys.ShootCommand}
-                    />
-                    <StatusCard
-                      label="IntakeCommand"
-                      status={keys.IntakeCommand}
-                    />
-                    <StatusCard
-                      label="OuterIndexCommand"
-                      status={keys.OuterIndexCommand}
-                    />
-                    <StatusCard
-                      label="InnerIndexCommand"
-                      status={keys.InnerIndexCommand}
-                    />
-                  </>
-                )}
+                ds
               </div>
             </div>
           </div>

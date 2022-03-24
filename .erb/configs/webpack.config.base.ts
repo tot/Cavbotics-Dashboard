@@ -6,7 +6,7 @@ import webpack from 'webpack';
 import webpackPaths from './webpack.paths';
 import { dependencies as externals } from '../../release/app/package.json';
 
-export default {
+const configuration: webpack.Configuration = {
   externals: [...Object.keys(externals || {})],
 
   stats: 'errors-only',
@@ -29,6 +29,8 @@ export default {
 
   output: {
     path: webpackPaths.srcPath,
+    // path: path.join(__dirname, 'app'),
+    filename: '[name].entry.js',
     // https://github.com/webpack/webpack/issues/1114
     library: {
       type: 'commonjs2',
@@ -49,3 +51,5 @@ export default {
     }),
   ],
 };
+
+export default configuration;
