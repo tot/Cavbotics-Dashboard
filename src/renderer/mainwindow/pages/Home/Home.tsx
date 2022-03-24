@@ -13,6 +13,7 @@ import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationC
 import InfoCard from '../../components/InfoCard/InfoCard';
 
 interface Keys {
+  connection: boolean;
   DeclineHoodCommand: boolean;
   DoNothingCommand: boolean;
   ExtendClimberCommand: boolean;
@@ -35,8 +36,8 @@ interface Keys {
 }
 
 const Home: React.FC = () => {
-  const [connection, setConnection] = useState(false);
   const [keys, setKeys] = useState<Keys>({
+    connection: false,
     DeclineHoodCommand: false,
     DoNothingCommand: false,
     ExtendClimberCommand: false,
@@ -57,29 +58,11 @@ const Home: React.FC = () => {
     D: 0,
     shooterMode: 0,
   });
-  useEffect(() => {
-    const fetchConnection = async () => {
-      try {
-        const res = await axios('http://127.0.0.1:8883/getconnection');
-        const data = await res.data;
-        if (res.data.Connected) {
-          setConnection(true);
-        } else setConnection(false);
-        console.log(data);
-      } catch (e) {
-        console.log(e);
-        setConnection(false);
-      }
-    };
-    setTimeout(() => {
-      fetchConnection();
-    }, 10000);
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios('http://127.0.0.1:8883/getall');
+        const res = await axios('http://127.0.0.1:8883/getstatuses');
         const data = await res.data;
         setKeys(res.data.data);
         console.log(data);
@@ -87,11 +70,10 @@ const Home: React.FC = () => {
         console.log(e);
       }
     };
-    fetchData();
-    // setTimeout(() => {
-    //   fetchData();
-    // }, 5000);
-  }, []);
+    setTimeout(() => {
+      fetchData();
+    }, 1000);
+  });
 
   return (
     <div className="w-screen h-screen bg-neutral-900 p-4 flex flex-col">
@@ -107,12 +89,12 @@ const Home: React.FC = () => {
             <h1 className="font-normal flex items-center">
               <div
                 className={`ml-2 relative w-4 h-4 ${
-                  connection ? 'bg-green-500/20' : 'bg-amber-500/20'
+                  keys.connection ? 'bg-green-500/20' : 'bg-amber-500/20'
                 }  rounded-full mr-2`}
               >
                 <div
                   className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${
-                    connection ? 'bg-green-500' : 'bg-amber-500'
+                    keys.connection ? 'bg-green-500' : 'bg-amber-500'
                   }`}
                 />
               </div>
@@ -210,7 +192,9 @@ const Home: React.FC = () => {
                   type="button"
                   onClick={async () => {
                     try {
-                      const res = await axios('http://127.0.0.1:8883/getall');
+                      const res = await axios(
+                        'http://127.0.0.1:8883/getstatuses'
+                      );
                       const data = await res.data;
                       setKeys(res.data.data);
                       console.log(data.data);

@@ -15,7 +15,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { spawn } from 'child_process';
-import { kill } from 'tree-kill';
+import kill from 'tree-kill';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -26,10 +26,10 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
-const child = spawn('java', ['-jar', `${app.getAppPath()}\\server.jar`, '']);
-console.log(app.getAppPath());
+// const child = spawn('java', ['-jar', `${app.getAppPath()}\\server.jar`, '']);
+// console.log(app.getAppPath());
 
-kill(child.pid);
+// kill(child.pid);
 
 let mainwindow: BrowserWindow | null = null;
 let limelightwindow: BrowserWindow | null = null;
