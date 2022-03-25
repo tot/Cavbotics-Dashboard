@@ -8,9 +8,14 @@ import {
   FiRefreshCcw,
   FiSettings,
 } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 import StatusCard from '../../components/StatusCard/StatusCard';
 import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
 import InfoCard from '../../components/InfoCard/InfoCard';
+
+interface NotificationProps {
+  message: string;
+}
 
 interface Keys {
   connection: boolean;
@@ -119,6 +124,15 @@ const Home: React.FC = () => {
   //   }, 1000);
   // });
 
+  const notify = ({ message }: NotificationProps) => {
+    toast(<p>message</p>, {
+      position: toast.POSITION.TOP_RIGHT,
+      // className: 'bg-neutral-800 shadow-lg border border-neutral-700',
+      autoClose: 5000,
+      theme: 'dark',
+    });
+  };
+
   return (
     <div className="w-screen h-screen bg-neutral-900 p-4 flex flex-col">
       <div className="mb-6 pb-4 border-b border-neutral-700 text-base text-white font-semibold flex justify-between items-center">
@@ -146,6 +160,9 @@ const Home: React.FC = () => {
           </div>
         </div>
         <div className="">
+          <button type="button" onClick={() => notify('test')}>
+            test
+          </button>
           <button
             onClick={() => window.electron.ipcRenderer.openWebcam()}
             type="button"
