@@ -12,10 +12,36 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import MenuBuilder from './menu'; // eslint-disable-line
+import { autoUpdater } from 'electron-updater';
+import log from 'electron-log';
+import { spawn } from 'child_process';
+import kill from 'tree-kill';
+import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
-let mainWindow: BrowserWindow | null = null;
+export default class AppUpdater {
+  constructor() {
+    log.transports.file.level = 'info';
+    autoUpdater.logger = log;
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+}
+
+const child = spawn('java', ['-jar', `${app.getAppPath()}\\server.jar`, '']);
+console.log(app.getAppPath());
+
+kill(child.pid);
+
+let mainwindow: BrowserWindow | null = null;
+let limelightwindow: BrowserWindow | null = null;
+let webcamwindow: BrowserWindow | null = null;
+
+ipcMain.on('ipc-example', async (event, arg) => {
+  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
+  console.log(msgTemplate(arg));
+  event.reply('ipc-example', msgTemplate('pong'));
+  console.log(app.getAppPath());
+});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -55,42 +81,45 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  mainWindow = new BrowserWindow({
+  mainwindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
     },
   });
 
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainwindow.loadURL(resolveHtmlPath('mainwindow/index.html'));
 
-  mainWindow.on('ready-to-show', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
+  mainwindow.on('ready-to-show', () => {
+    if (!mainwindow) {
+      throw new Error('"limelightwindow" is not defined');
     }
     if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
+      mainwindow.minimize();
     } else {
-      mainWindow.show();
+      mainwindow.show();
     }
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
+  mainwindow.on('closed', () => {
+    mainwindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  const menuBuilder1 = new MenuBuilder(mainwindow);
+  menuBuilder1.buildMenu();
 
   // Open urls in the user's browser
-  mainWindow.webContents.on('new-window', (event, url) => {
+  mainwindow.webContents.on('new-window', (event, url) => {
     event.preventDefault();
     shell.openExternal(url);
   });
+
+  // Remove this if your app does not use auto updates
+  // eslint-disable-next-line
+  new AppUpdater();
 };
 
 /**
@@ -112,82 +141,109 @@ app
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) createWindow();
+      if (mainwindow === null) {
+        createWindow();
+      }
     });
   })
   .catch(console.log);
 
-ipcMain.handle('open:webcam', async () => {
-  await installExtensions();
-  const webcamwin = new BrowserWindow({
-    height: 600,
-    width: 800,
-    frame: true,
-    webPreferences: {
-      nodeIntegration: true,
-    },
-  });
-  webcamwin.loadURL(resolveHtmlPath('index.html'));
-});
-
 ipcMain.handle('open:limelight', async () => {
-  await installExtensions();
-  const limelightwin = new BrowserWindow({
-    height: 600,
-    width: 800,
-    frame: true,
-    webPreferences: {
-      nodeIntegration: true,
-    },
-  });
-  limelightwin.loadURL(resolveHtmlPath('index.html'));
-});
-
-export default async function createNewWindow() {
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
+  if (isDevelopment) {
     await installExtensions();
   }
-  let x;
-  let y;
 
-  const currentWindow = BrowserWindow.getFocusedWindow();
-  if (currentWindow) {
-    const [currentWindowX, currentWindowY] = currentWindow.getPosition();
-    x = currentWindowX + 24;
-    y = currentWindowY + 24;
-  }
-  let newWindow: BrowserWindow | null = null;
-  newWindow = new BrowserWindow({
+  const RESOURCES_PATH = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(__dirname, '../../assets');
+
+  const getAssetPath = (...paths: string[]): string => {
+    return path.join(RESOURCES_PATH, ...paths);
+  };
+
+  limelightwindow = new BrowserWindow({
     show: false,
-    width: 1200,
-    height: 812,
-    x,
-    y,
+    width: 1024,
+    height: 728,
+    icon: getAssetPath('icon.png'),
     webPreferences: {
-      nodeIntegration: true,
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
-  newWindow.loadURL(resolveHtmlPath('index.html'));
-  newWindow.webContents.on('did-finish-load', () => {
-    if (!newWindow) {
-      throw new Error('"newWindow" is not defined');
+  limelightwindow.loadURL(resolveHtmlPath('limelightwindow/index.html'));
+
+  limelightwindow.on('ready-to-show', () => {
+    if (!limelightwindow) {
+      throw new Error('"limelightwindow" is not defined');
     }
     if (process.env.START_MINIMIZED) {
-      newWindow.minimize();
+      limelightwindow.minimize();
     } else {
-      newWindow.show();
-      newWindow.focus();
+      limelightwindow.show();
     }
   });
-  newWindow.on('closed', () => {
-    newWindow = null;
+
+  limelightwindow.on('closed', () => {
+    mainwindow = null;
   });
-  newWindow.on('focus', () => {
-    const menuBuilder = new MenuBuilder(newWindow);
-    menuBuilder.buildMenu();
+
+  // Open urls in the user's browser
+  limelightwindow.webContents.on('new-window', (event, url) => {
+    event.preventDefault();
+    shell.openExternal(url);
   });
-  return newWindow;
-}
+
+  const menuBuilder2 = new MenuBuilder(limelightwindow);
+
+  menuBuilder2.buildMenu();
+});
+
+ipcMain.handle('open:webcam', async () => {
+  if (isDevelopment) {
+    await installExtensions();
+  }
+
+  const RESOURCES_PATH = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(__dirname, '../../assets');
+
+  const getAssetPath = (...paths: string[]): string => {
+    return path.join(RESOURCES_PATH, ...paths);
+  };
+
+  webcamwindow = new BrowserWindow({
+    show: false,
+    width: 1024,
+    height: 728,
+    icon: getAssetPath('icon.png'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
+  webcamwindow.loadURL(resolveHtmlPath('webcamwindow/index.html'));
+
+  webcamwindow.on('ready-to-show', () => {
+    if (!webcamwindow) {
+      throw new Error('"webcamwindow" is not defined');
+    }
+    if (process.env.START_MINIMIZED) {
+      webcamwindow.minimize();
+    } else {
+      webcamwindow.show();
+    }
+  });
+
+  webcamwindow.on('closed', () => {
+    mainwindow = null;
+  });
+
+  // Open urls in the user's browser
+  webcamwindow.webContents.on('new-window', (event, url) => {
+    event.preventDefault();
+    shell.openExternal(url);
+  });
+
+  const menuBuilder2 = new MenuBuilder(webcamwindow);
+
+  menuBuilder2.buildMenu();
+});

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import {
   FiClock,
   FiCrosshair,
@@ -8,49 +8,116 @@ import {
   FiRefreshCcw,
   FiSettings,
 } from 'react-icons/fi';
-
 import StatusCard from '../../components/StatusCard/StatusCard';
 import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
 import InfoCard from '../../components/InfoCard/InfoCard';
 
+interface Keys {
+  connection: boolean;
+  DeclineHoodCommand: boolean;
+  DoNothingCommand: boolean;
+  ExtendClimberCommand: boolean;
+  ledMode: number;
+  HoodCommand: boolean;
+  InnerIndexCommand: boolean;
+  IntakeCommand: boolean;
+  KickOutBallsCommand: boolean;
+  OneBallAuto: boolean;
+  OuterIndexCommand: boolean;
+  RaiseHoodCommand: boolean;
+  RetractClimberCode: boolean;
+  ShootCommand: boolean;
+  SwerveCommand: boolean;
+  routine: number;
+  P: number;
+  I: number;
+  D: number;
+  shooterMode: number;
+  batteryVoltage: number;
+}
+
 const Home: React.FC = () => {
-  const [connection, setConnection] = useState(false);
-  const [keys, setKeys] = useState({});
-  useEffect(() => {
-    const fetchConnection = async () => {
-      try {
-        const res = await axios('http://127.0.0.1:8883/getconnection');
-        const data = await res.data;
-        if (res.data.Connected) {
-          setConnection(true);
-        } else setConnection(false);
-        console.log(data);
-      } catch (e) {
-        console.log(e);
-        setConnection(false);
-      }
-    };
-    setTimeout(() => {
-      fetchConnection();
-    }, 10000);
-  }, []);
+  const [time, setTime] = useState<number>(0);
+  const [running, setRunning] = useState<boolean>(false);
+
+  useHotkeys('ctrl+f', () => {
+    setRunning(true);
+    console.log('ctrl f');
+  });
+
+  useHotkeys('ctrl+d', () => {
+    setRunning(false);
+    console.log('ctrl d');
+  });
+
+  useHotkeys('ctrl+g', () => {
+    setTime(0);
+    console.log('ctrl r');
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios('http://127.0.0.1:8883/getall');
-        const data = await res.data;
-        setKeys(res.data.data);
-        console.log(data);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    fetchData();
-    // setTimeout(() => {
-    //   fetchData();
-    // }, 5000);
-  }, []);
+    let interval;
+    if (running) {
+      console.log('timer running');
+      interval = setInterval(() => {
+        setTime(time + 10);
+      }, 10);
+    } else if (!running) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  });
+
+  const [keys, setKeys] = useState<Keys>({
+    connection: false,
+    DeclineHoodCommand: false,
+    DoNothingCommand: false,
+    ExtendClimberCommand: false,
+    ledMode: 0,
+    HoodCommand: false,
+    InnerIndexCommand: false,
+    IntakeCommand: false,
+    KickOutBallsCommand: false,
+    OneBallAuto: false,
+    OuterIndexCommand: false,
+    RaiseHoodCommand: false,
+    RetractClimberCode: false,
+    ShootCommand: false,
+    SwerveCommand: false,
+    routine: 0,
+    P: 0,
+    I: 0,
+    D: 0,
+    shooterMode: 0,
+    batteryVoltage: 0,
+  });
+
+  const excludeKeysArr = [
+    'connection',
+    'ledMode',
+    'routine',
+    'P',
+    'I',
+    'D',
+    'shooterMode',
+    'batteryVoltage',
+  ];
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await axios('http://127.0.0.1:8883/getstatuses');
+  //       const data = await res.data;
+  //       setKeys(res.data.data);
+  //       console.log(data);
+  //     } catch (e) {
+  //       console.log(e);
+  //     }
+  //   };
+  //   setTimeout(() => {
+  //     fetchData();
+  //   }, 1000);
+  // });
 
   return (
     <div className="w-screen h-screen bg-neutral-900 p-4 flex flex-col">
@@ -66,12 +133,12 @@ const Home: React.FC = () => {
             <h1 className="font-normal flex items-center">
               <div
                 className={`ml-2 relative w-4 h-4 ${
-                  connection ? 'bg-green-500/20' : 'bg-amber-500/20'
+                  keys.connection ? 'bg-green-500/20' : 'bg-amber-500/20'
                 }  rounded-full mr-2`}
               >
                 <div
                   className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${
-                    connection ? 'bg-green-500' : 'bg-amber-500'
+                    keys.connection ? 'bg-green-500' : 'bg-amber-500'
                   }`}
                 />
               </div>
@@ -79,31 +146,35 @@ const Home: React.FC = () => {
           </div>
         </div>
         <div className="">
-          <Link
-            to="/webcamfeed"
+          <button
+            onClick={() => window.electron.ipcRenderer.openWebcam()}
+            type="button"
             className="text-base font-normal text-neutral-400 border-none outline-none"
           >
             Webcam
-          </Link>{' '}
+          </button>{' '}
           <span className="px-2 text-neutral-700/50">|</span>{' '}
-          <Link
-            to="/limelightfeed"
+          <button
+            type="button"
+            onClick={() => window.electron.ipcRenderer.openLimelight()}
             className="text-base font-normal text-neutral-400 border-none outline-none"
           >
             Limelight
-          </Link>
+          </button>
         </div>
       </div>
       <div className="grid grid-cols-4 mb-6 mt-2 gap-4">
         <InfoCard label="Robot IP" info="10.85.90.11" color="border-blue-500" />
         <InfoCard
           label="Battery Percentage"
-          info="--"
+          info={keys.batteryVoltage}
           color="border-teal-500"
         />
         <InfoCard
           label="Current Runtime"
-          info="--"
+          info={`${`0${Math.floor((time / 1000) % 60)}`.slice(-2)}:${`0${
+            (time / 10) % 100
+          }`.slice(-2)}`}
           color="border-emerald-500"
         />
         <InfoCard label="Unavailable" info="--" color="border-amber-500" />
@@ -167,7 +238,9 @@ const Home: React.FC = () => {
                   type="button"
                   onClick={async () => {
                     try {
-                      const res = await axios('http://127.0.0.1:8883/getall');
+                      const res = await axios(
+                        'http://127.0.0.1:8883/getstatuses'
+                      );
                       const data = await res.data;
                       setKeys(res.data.data);
                       console.log(data.data);
@@ -181,32 +254,23 @@ const Home: React.FC = () => {
               </h1>
             </div>
             <div className="relative flex flex-1">
-              <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4">
-                {Object.keys(keys).length <= 0 ? (
-                  <p className="text-neutral-300">
-                    Could not retrieve statuses
-                  </p>
-                ) : (
-                  <>
-                    {/* <p className="text-neutral-300">Display statuses</p> */}
+              <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4 pr-2">
+                {/* <StatusCard
+                  label="DeclineHoodCommand"
+                  status={keys.DeclineHoodCommand}
+                /> */}
+                {Object.keys(keys).map((key: string) => {
+                  if (excludeKeysArr.includes(key)) {
+                    return <></>;
+                  }
+                  return (
                     <StatusCard
-                      label="ShootCommand"
-                      status={keys.ShootCommand}
+                      label={key}
+                      key={key}
+                      status={keys[key as keyof typeof keys]}
                     />
-                    <StatusCard
-                      label="IntakeCommand"
-                      status={keys.IntakeCommand}
-                    />
-                    <StatusCard
-                      label="OuterIndexCommand"
-                      status={keys.OuterIndexCommand}
-                    />
-                    <StatusCard
-                      label="InnerIndexCommand"
-                      status={keys.InnerIndexCommand}
-                    />
-                  </>
-                )}
+                  );
+                })}
               </div>
             </div>
           </div>
