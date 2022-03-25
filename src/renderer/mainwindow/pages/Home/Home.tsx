@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import axios from 'axios';
 import {
   FiClock,
@@ -7,7 +8,6 @@ import {
   FiRefreshCcw,
   FiSettings,
 } from 'react-icons/fi';
-
 import StatusCard from '../../components/StatusCard/StatusCard';
 import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
 import InfoCard from '../../components/InfoCard/InfoCard';
@@ -33,9 +33,41 @@ interface Keys {
   I: number;
   D: number;
   shooterMode: number;
+  batteryVoltage: number;
 }
 
 const Home: React.FC = () => {
+  const [time, setTime] = useState<number>(0);
+  const [running, setRunning] = useState<boolean>(false);
+
+  useHotkeys('ctrl+f', () => {
+    setRunning(true);
+    console.log('ctrl f');
+  });
+
+  useHotkeys('ctrl+d', () => {
+    setRunning(false);
+    console.log('ctrl d');
+  });
+
+  useHotkeys('ctrl+g', () => {
+    setTime(0);
+    console.log('ctrl r');
+  });
+
+  useEffect(() => {
+    let interval;
+    if (running) {
+      console.log('timer running');
+      interval = setInterval(() => {
+        setTime(time + 10);
+      }, 10);
+    } else if (!running) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  });
+
   const [keys, setKeys] = useState<Keys>({
     connection: false,
     DeclineHoodCommand: false,
@@ -57,23 +89,35 @@ const Home: React.FC = () => {
     I: 0,
     D: 0,
     shooterMode: 0,
+    batteryVoltage: 0,
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios('http://127.0.0.1:8883/getstatuses');
-        const data = await res.data;
-        setKeys(res.data.data);
-        console.log(data);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    setTimeout(() => {
-      fetchData();
-    }, 1000);
-  });
+  const excludeKeysArr = [
+    'connection',
+    'ledMode',
+    'routine',
+    'P',
+    'I',
+    'D',
+    'shooterMode',
+    'batteryVoltage',
+  ];
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await axios('http://127.0.0.1:8883/getstatuses');
+  //       const data = await res.data;
+  //       setKeys(res.data.data);
+  //       console.log(data);
+  //     } catch (e) {
+  //       console.log(e);
+  //     }
+  //   };
+  //   setTimeout(() => {
+  //     fetchData();
+  //   }, 1000);
+  // });
 
   return (
     <div className="w-screen h-screen bg-neutral-900 p-4 flex flex-col">
@@ -123,12 +167,14 @@ const Home: React.FC = () => {
         <InfoCard label="Robot IP" info="10.85.90.11" color="border-blue-500" />
         <InfoCard
           label="Battery Percentage"
-          info="--"
+          info={keys.batteryVoltage}
           color="border-teal-500"
         />
         <InfoCard
           label="Current Runtime"
-          info="--"
+          info={`${`0${Math.floor((time / 1000) % 60)}`.slice(-2)}:${`0${
+            (time / 10) % 100
+          }`.slice(-2)}`}
           color="border-emerald-500"
         />
         <InfoCard label="Unavailable" info="--" color="border-amber-500" />
@@ -208,11 +254,23 @@ const Home: React.FC = () => {
               </h1>
             </div>
             <div className="relative flex flex-1">
-              <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4">
-                <StatusCard
+              <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4 pr-2">
+                {/* <StatusCard
                   label="DeclineHoodCommand"
                   status={keys.DeclineHoodCommand}
-                />
+                /> */}
+                {Object.keys(keys).map((key: string) => {
+                  if (excludeKeysArr.includes(key)) {
+                    return <></>;
+                  }
+                  return (
+                    <StatusCard
+                      label={key}
+                      key={key}
+                      status={keys[key as keyof typeof keys]}
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>

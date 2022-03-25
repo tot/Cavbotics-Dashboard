@@ -26,10 +26,11 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
-// const child = spawn('java', ['-jar', `${app.getAppPath()}\\server.jar`, '']);
-// console.log(app.getAppPath());
 
-// kill(child.pid);
+const child = spawn('java', ['-jar', `${app.getAppPath()}\\server.jar`, '']);
+console.log(app.getAppPath());
+
+kill(child.pid);
 
 let mainwindow: BrowserWindow | null = null;
 let limelightwindow: BrowserWindow | null = null;
@@ -39,6 +40,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+  console.log(app.getAppPath());
 });
 
 if (process.env.NODE_ENV === 'production') {

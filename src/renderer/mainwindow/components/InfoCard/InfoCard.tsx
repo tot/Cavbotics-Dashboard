@@ -1,6 +1,6 @@
 interface Props {
   label: string;
-  info: string;
+  info: string | number;
   color: string;
 }
 
