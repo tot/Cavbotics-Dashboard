@@ -11,6 +11,7 @@ import {
 import StatusCard from '../../components/StatusCard/StatusCard';
 import ConfigurationCard from '../../components/ConfigurationCard/ConfigurationCard';
 import InfoCard from '../../components/InfoCard/InfoCard';
+import TimerCard from 'renderer/mainwindow/components/TimerCard/TimerCard';
 
 interface Keys {
   connection: boolean;
@@ -68,6 +69,45 @@ const Home: React.FC = () => {
     return () => clearInterval(interval);
   });
 
+
+  
+  const [shooterMode, setMode] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios('http://127.0.0.1:8883/getall');
+        const data = await res.data;
+        setMode(res.data.shooterMode);
+        console.log(data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchData();
+  }, []);
+
+
+  // useEffect(() => {
+  //   onClick={async () => {
+  //     try {
+  //       const res = await axios.post(
+  //         'http://127.0.0.1:8883/double/set',
+  //         {
+  //           key: 'shooterMode',
+  //           value: 0,
+  //         }
+  //       );
+  //       setMode(0);
+  //       console.log(await res.data);
+  //     } catch (e) {
+  //       console.log(e);
+  //       setMode(0);
+  //     }
+  //   }}
+  // }, []);
+
+  
   const [keys, setKeys] = useState<Keys>({
     connection: false,
     DeclineHoodCommand: false,
@@ -103,6 +143,9 @@ const Home: React.FC = () => {
     'batteryVoltage',
   ];
 
+
+  
+
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {
@@ -120,7 +163,7 @@ const Home: React.FC = () => {
   // });
 
   return (
-    <div className="w-screen h-screen bg-neutral-900 p-4 flex flex-col">
+    <div className="w-screen h-screen bg-neutral-900 p-4 flex flex-col space-y-4">
       <div className="mb-6 pb-4 border-b border-neutral-700 text-base text-white font-semibold flex justify-between items-center">
         <div className="">
           <div className="text-base text-white flex items-center">
@@ -163,75 +206,16 @@ const Home: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-4 mb-6 mt-2 gap-4">
+      {/* <div className="grid grid-cols-2 mb-6 mt-2 gap-4 w-1/2">
         <InfoCard label="Robot IP" info="10.85.90.11" color="border-blue-500" />
         <InfoCard
           label="Battery Percentage"
           info={keys.batteryVoltage}
           color="border-teal-500"
         />
-        <InfoCard
-          label="Current Runtime"
-          info={`${`0${Math.floor((time / 1000) % 60)}`.slice(-2)}:${`0${
-            (time / 10) % 100
-          }`.slice(-2)}`}
-          color="border-emerald-500"
-        />
-        <InfoCard label="Unavailable" info="--" color="border-amber-500" />
-      </div>
-      <div className="flex w-full flex-1">
-        <div className="grid grid-cols-2 w-full gap-6">
-          <div className="col-span-1 flex flex-col">
-            <h1 className="text-neutral-300 text-base font-normal">
-              Configuration
-            </h1>
-            <div className="flex flex-1 mt-4 w-full">
-              <div className="grid grid-cols-2 gap-4 w-full">
-                <ConfigurationCard
-                  title="Limelight"
-                  description="Configure vision settings"
-                  icon={
-                    <div className="p-2 inline-block rounded-md bg-green-600">
-                      <FiEye color="white" size={24} />
-                    </div>
-                  }
-                  to="/limelight"
-                />
-                <ConfigurationCard
-                  title="Autonomous"
-                  description="Configure routines"
-                  icon={
-                    <div className="p-2 inline-block rounded-md bg-amber-600">
-                      <FiClock color="white" size={24} />
-                    </div>
-                  }
-                  to="/autonomous"
-                />
-                <ConfigurationCard
-                  title="Shooter"
-                  description="Configure shooter settings"
-                  icon={
-                    <div className="p-2 inline-block rounded-md bg-rose-600">
-                      <FiCrosshair color="white" size={24} />
-                    </div>
-                  }
-                  to="/shooter"
-                />
-                <ConfigurationCard
-                  title="PID Tuning"
-                  description="Configure vision settings"
-                  icon={
-                    <div className="p-2 inline-block rounded-md bg-indigo-600">
-                      <FiSettings color="white" size={24} />
-                    </div>
-                  }
-                  to="/pid"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="rounded-md border-neutral-700/60 flex flex-col">
-            <div className="flex justify-between">
+        <div className=" mb-6 mt-2 gap-4 w-1/2 flow-root">
+        <div className="rounded-md border-neutral-700/60 flex flex-col col-span-2 float-right">
+            <div className="flex justify-between flex-1">
               <h1 className="text-neutral-300 text-base font-normal flex items-center">
                 Robot Statuses
                 <button
@@ -254,11 +238,11 @@ const Home: React.FC = () => {
               </h1>
             </div>
             <div className="relative flex flex-1">
-              <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4 pr-2">
-                {/* <StatusCard
+              <div className="mt-4 absolute inset-0 overflow-y-auto space-y-4 pr-2 align-text-top">
+                <StatusCard
                   label="DeclineHoodCommand"
                   status={keys.DeclineHoodCommand}
-                /> */}
+                /> 
                 {Object.keys(keys).map((key: string) => {
                   if (excludeKeysArr.includes(key)) {
                     return <></>;
@@ -274,7 +258,184 @@ const Home: React.FC = () => {
               </div>
             </div>
           </div>
+          </div> */}
+
+        
+        {/* <InfoCard
+          label="Current Runtime"
+          info={`${`0${Math.floor((time / 1000) % 60)}`.slice(-2)}:${`0${
+            (time / 10) % 100
+          }`.slice(-2)}`}
+          color="border-emerald-500"
+        /> */}
+      {/* </div> */}
+      {/* <div className="flex w-full flex-">
+        <div className="grid grid-cols-2 w-full gap-6">
+          <div className="col-span-1 flex flex-col">
+            <h1 className="text-neutral-300 text-base font-normal">
+              Current Runtime
+            </h1>
+            <div className="flex flex-1 mt-4 w-full">
+              /* <div className="grid grid-cols-2 gap-4 w-full">
+              <InfoCard
+          label="Current Runtime"
+          info={`${`0${Math.floor((time / 1000) % 60)}`.slice(-2)}:${`0${
+            (time / 10) % 100
+          }`.slice(-2)}`}
+          color="border-emerald-500"
+              />              
+              </div> 
+            </div>
+          </div>
         </div>
+        </div> */}
+        <div className="flex w-full">
+        <div className="grid grid-cols-1 w-full gap-0s">
+          <div className="col-span-1 flex flex-col">
+            <h1 className="text-neutral-300 text-base font-normal">
+              Stopwatch
+            </h1>
+            <div className="flex flex-1 mt-4 w-full">
+              <div className="grid grid-cols-2 gap-4 w-full">
+              <TimerCard
+          label="Current Runtime"
+          info={`${`0${Math.floor((time / 1000) % 60)}`.slice(-2)}:${`0${
+            (time / 10) % 100
+          }`.slice(-2)}`}
+          color="border-emerald-500"
+              /> 
+                  <div className="w-auto h-fit bg-neutral-900 flex flex-col p-4">
+      <div className="flex-1 w-auto h-auto relative flex items-center justify-center">
+        <p className="absolute inset-0 text-white">Webcam camera feed</p>
+        <img
+          src="http://roborio-8590-frc.local:1181/stream.mjpg"
+          // src="http://10.85.90.2:1181/stream.mjpg"
+          className="w-auto h-3/4 relative z-10"
+          alt="Webcam camera feed"
+        />
+      </div>
+    </div>
+             
+              </div>
+            </div>
+          </div>
+          </div>
+          
+          </div>
+      <div className="flex w-full flex-">
+        <div className="grid grid-cols-1 w-full gap-6">
+          <div className="col-span-1 flex flex-col">
+            <h1 className="text-neutral-300 text-base font-normal">
+              Configuration
+            </h1>
+            <div className="flex flex-1 mt-4 w-full">
+              <div className="grid grid-cols-2 gap-4 w-full h-full">
+                <ConfigurationCard
+                  title="Limelight"
+                  description="Configure vision settings"
+                  icon={
+                    <div className="p-2 inline-block rounded-md bg-green-600">
+                      <FiEye color="white" size={24} />
+                    </div>
+                  }
+                  to="/limelight"
+                />
+                <ConfigurationCard
+                  title="Autonomous"
+                  description="Configure routines"
+                  icon={
+                    <div className="p-2 inline-block rounded-md bg-amber-600">
+                      <FiClock color="white" size={24} />
+                    </div>
+                  }
+                  to="/autonomous"
+                />
+                {/* <ConfigurationCard
+                  title="Shooter"
+                  description="Configure shooter settings"
+                  icon={
+                    <div className="p-2 inline-block rounded-md bg-rose-600">
+                      <FiCrosshair color="white" size={24} />
+                    </div>
+                  }
+                  to="/shooter"
+                />
+                <ConfigurationCard
+                  title="PID Tuning"
+                  description="Configure vision settings"
+                  icon={
+                    <div className="p-2 inline-block rounded-md bg-indigo-600">
+                      <FiSettings color="white" size={24} />
+                    </div>
+                  }
+                  to="/pid" */}
+                {/* /> */}
+              </div>
+            </div>
+          </div>
+        </div>
+      <div className="w-screen h-screen bg-neutral-900 flex flex-col p-3 h-1/2 ml-7">
+      {/* <Link to="/home" className="text-neutral-400 flex items-center">
+        <FiArrowLeft className="text-neutral-400 mr-2" size={16} />
+        Home
+      </Link> */}
+      <div className="pt-6">
+        <h1 className="text-2xl text-white font-medium">Shooter</h1>
+        <p className="text-base text-neutral-400">Adjust shooter settings</p>
+      </div>
+      <div className="pt-8">
+        <p className="text-neutral-300 pb-4">
+          Current routine: {shooterMode === 0 ? 'autoaim' : 'manual'}
+        </p>
+        <div className="space-x-4">
+          <button
+            type="button"
+            className="inline-block px-16 py-8 rounded-md bg-neutral-700 text-white"
+            onClick={async () => {
+              try {
+                const res = await axios.post(
+                  'http://127.0.0.1:8883/double/set',
+                  {
+                    key: 'shooterMode',
+                    value: 0,
+                  }
+                );
+                setMode(0);
+                console.log(await res.data);
+              } catch (e) {
+                console.log(e);
+                setMode(0);
+              }
+            }}
+          >
+            Autoaim Shooter
+          </button>
+          <button
+            type="button"
+            className="inline-block px-16 py-8 rounded-md bg-neutral-700 text-white"
+            onClick={async () => {
+              try {
+                const res = await axios.post(
+                  'http://127.0.0.1:8883/double/set',
+                  {
+                    key: 'shooterMode',
+                    value: 1,
+                  }
+                );
+                setMode(1);
+                console.log(await res.data);
+              } catch (e) {
+                console.log(e);
+                setMode(0);
+              }
+            }}
+          >
+            Manual Shooter
+          </button>
+        </div>
+      </div>
+    </div>
+
       </div>
     </div>
   );
