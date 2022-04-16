@@ -7,7 +7,7 @@ interface Props {
 const InfoCard: React.FC<Props> = ({ label, info, color }: Props) => {
   return (
     <div className={`border-l-2 ${color} rounded bg-neutral-700/20 p-4`}>
-      <h2 className="text-lg text-neutral-200">{info}</h2>
+      <h1 className="text-lg text-neutral-200">{info}</h1>
       <p className="text-sm text-neutral-500">{label}</p>
     </div>
   );
