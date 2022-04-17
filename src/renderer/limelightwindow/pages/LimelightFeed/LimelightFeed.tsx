@@ -6,7 +6,7 @@ const LimelightFeed = () => {
         <img
           // src="http://10.85.90.39:5800/stream.mjpg"
           src="http://10.85.90.11:5800/stream.mjpg"
-          className="w-full h-72 relative z-10"
+          className="w-autp h-full relative z-10"
           alt="Limelight camera feed"
         />
       </div>

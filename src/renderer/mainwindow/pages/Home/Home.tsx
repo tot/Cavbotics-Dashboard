@@ -35,10 +35,11 @@ interface Keys {
   D: number;
   shooterMode: number;
   batteryVoltage: number;
+  robotMode: number;
 }
 
 const Home: React.FC = () => {
-  const [time, setTime] = useState<number>(0);
+  const [time, setTime] = useState<number>(135000);
   const [running, setRunning] = useState<boolean>(false);
 
   useHotkeys('ctrl+f', () => {
@@ -53,7 +54,7 @@ const Home: React.FC = () => {
 
   useHotkeys('ctrl+g', () => {
     setTime(0);
-    console.log('ctrl r');
+    console.log('ctrl g');
   });
 
   useEffect(() => {
@@ -61,7 +62,7 @@ const Home: React.FC = () => {
     if (running) {
       console.log('timer running');
       interval = setInterval(() => {
-        setTime(time + 10);
+        setTime(time - 10);
       }, 10);
     } else if (!running) {
       clearInterval(interval);
@@ -70,23 +71,73 @@ const Home: React.FC = () => {
   });
 
 
+
+
+
+
+  const [robotMode, setRobotMode] = useState<number>(0);
   
-  const [shooterMode, setMode] = useState<number>(0);
+  const robotmode = {
+    mode: robotMode
+  } 
+
+  const handler = {
+    set: function(robotmode, mode, value){
+      robotmode[mode] = value;
+      setRunning(true);
+      return true;
+    }
+  }
+  const proxy1 = new Proxy(robotmode, handler)
 
   useEffect(() => {
+    setInterval(()=>{
     const fetchData = async () => {
       try {
-        const res = await axios('http://127.0.0.1:8883/getall');
+        const res = await axios.get('http://127.0.0.1:8883/double/get?key=robotMode');
         const data = await res.data;
-        setMode(res.data.shooterMode);
-        console.log(data);
+        const val = data.val;
+        if(robotMode != val){
+          setMode(val);
+          robotmode.mode = val
+        }
       } catch (e) {
         console.log(e);
       }
     };
     fetchData();
+    },100)
   }, []);
 
+
+
+
+
+  // var targetObj = {};
+  // var targetProxy = new Proxy(targetObj, {
+  // set: function (target, key, value) {
+  //     console.log(`${key} set to ${value}`);
+  //     target[key] = value;
+  //     return true;
+  //   }
+  // });
+
+
+
+  // const[teleStatus, setTeleStatus] = useState<number>(0);
+  
+  // useEffect(()=>{
+  //   setInterval(()=>{
+  //     if()
+  //       }, 100)
+  // }, [])
+
+  // useEffect(()=>{
+  //   fetchData()
+  // }, [teleStatus])
+
+  
+  const [shooterMode, setMode] = useState<number>(0);
 
   // useEffect(() => {
   //   onClick={async () => {
@@ -130,6 +181,7 @@ const Home: React.FC = () => {
     D: 0,
     shooterMode: 0,
     batteryVoltage: 0,
+    robotMode: 0,
   });
 
   const excludeKeysArr = [
@@ -141,6 +193,7 @@ const Home: React.FC = () => {
     'D',
     'shooterMode',
     'batteryVoltage',
+    'robotMode',
   ];
 
 
@@ -298,8 +351,8 @@ const Home: React.FC = () => {
             <div className="flex flex-1 mt-4 w-full">
               <div className="grid grid-cols-2 gap-4 w-full">
               <TimerCard
-          label="Current Runtime"
-          info={`${`0${Math.floor((time / 1000) % 60)}`.slice(-2)}:${`0${
+          label="Teleop Countdown"
+          info={`${`${Math.floor((time / 60000))}`.slice(-1)}:${`${Math.floor((time / 1000))%60}`.slice(-3)}:${`0${
             (time / 10) % 100
           }`.slice(-2)}`}
           color="border-emerald-500"
@@ -442,3 +495,7 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+function fetchData() {
+  throw new Error('Function not implemented.');
+}
+
